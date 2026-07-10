@@ -55,14 +55,24 @@ webhooksRouter.post("/api/webhooks/intake", async (req, res) => {
 
   const tenantId = process.env.TENANT_ID ?? "mhgstrategy";
 
-  const { contactId } = await syncIntakeToCrm({
-    tenantId,
-    clientEmail: body.clientEmail,
-    clientName: body.clientName ?? "",
-    formType: body.formType ?? "unknown",
-    dashboardId: body.dashboardId,
-    formData: body.formData,
-  });
+  let contactId: string;
+  try {
+    ({ contactId } = await syncIntakeToCrm({
+      tenantId,
+      clientEmail: body.clientEmail,
+      clientName: body.clientName ?? "",
+      formType: body.formType ?? "unknown",
+      dashboardId: body.dashboardId,
+      formData: body.formData,
+    }));
+  } catch (err) {
+    console.error("[intake webhook] CRM sync failed:", err);
+    res.status(503).json({
+      error: "CRM sync failed",
+      detail: err instanceof Error ? err.message : String(err),
+    });
+    return;
+  }
 
   // Mirror the submission into the local SQLite intake store so the HQ dashboard can display it.
   try {

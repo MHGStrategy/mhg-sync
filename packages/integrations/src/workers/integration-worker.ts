@@ -347,7 +347,9 @@ async function dispatchJob(job: IntegrationJobPayload): Promise<void> {
 
 export async function enqueueIntegrationJob(job: IntegrationJobPayload): Promise<void> {
   if (process.env.SKIP_REDIS_EVENTS === "true") {
-    await dispatchJob(job);
+    void dispatchJob(job).catch((err) => {
+      console.error("[INTEGRATION] Inline job failed:", job.jobName, err instanceof Error ? err.message : err);
+    });
     return;
   }
   if (!queue) {
