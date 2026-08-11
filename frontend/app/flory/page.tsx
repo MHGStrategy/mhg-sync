@@ -1,0 +1,344 @@
+"use client";
+
+import { useState, useMemo } from "react";
+
+type Entry = {
+  n: number;
+  term: string;
+  cat: string;
+  def: string;
+  say: string;
+};
+
+const ENTRIES: Entry[] = [
+  // 1–20 Resume: Business Systems & Workflow Improvement
+  { n: 1, term: "Current-State Workflow Documentation", cat: "Resume · Process", def: "Written map of how work actually runs today: steps, owners, systems, handoffs, and exceptions.", say: "I document as-is before I recommend to-be." },
+  { n: 2, term: "Business Rules", cat: "Resume · Process", def: "The if/then logic that governs decisions: approvals, discounts, inventory holds, routing.", say: "If it is not written as a rule, the system will not enforce it." },
+  { n: 3, term: "Requirements Definition", cat: "Resume · Process", def: "Turning a business need into a written spec that a developer or analyst can act on.", say: "Vague requirements produce wrong solutions." },
+  { n: 4, term: "Process Gap Analysis", cat: "Resume · Process", def: "Side-by-side comparison of current state and target state to identify missing steps, controls, or data.", say: "The gap between as-is and to-be is where the project lives." },
+  { n: 5, term: "Six Sigma (MBA Coursework)", cat: "Resume · Process", def: "Structured methodology for reducing variation and defects; Shaun covered extensively in MBA, no belt certification.", say: "Six Sigma principles from my MBA coursework — not a belt holder." },
+  { n: 6, term: "Theory of Constraints", cat: "Resume · Process", def: "Improvement methodology focused on the one bottleneck that limits system throughput.", say: "Fix the constraint first. Everything else is noise." },
+  { n: 7, term: "Cross-Functional Working Sessions", cat: "Resume · Process", def: "Structured meetings pulling owners from multiple departments to map, analyze, or redesign a shared process.", say: "No process belongs to one department." },
+  { n: 8, term: "Change Adoption & User Training", cat: "Resume · Process", def: "Plan for getting people to actually use the new system or process after go-live.", say: "Adoption is the last mile. Most projects fail there." },
+  { n: 9, term: "Operational Issue Resolution", cat: "Resume · Process", def: "Identifying root cause of a recurring operational problem and implementing a fix that does not recur.", say: "Fix the process, not the symptom." },
+  { n: 10, term: "Continuous Improvement Support", cat: "Resume · Process", def: "Ongoing cycle of measuring, finding problems, fixing, and re-measuring.", say: "CI is not a project. It is a cadence." },
+  // 11–20 Resume: Data, Reporting & Analysis
+  { n: 11, term: "SQL", cat: "Resume · Data", def: "Structured Query Language for querying, filtering, joining, and aggregating relational database tables.", say: "SQL is how I ask the database a question." },
+  { n: 12, term: "Excel (Power Query, Pivot Tables)", cat: "Resume · Data", def: "Power Query for ETL within Excel; Pivot Tables for fast cross-tab summaries without coding.", say: "Pivot Tables are the fastest way to validate a data set." },
+  { n: 13, term: "Python (pandas)", cat: "Resume · Data", def: "pandas library for data cleaning, transformation, and analysis in Python scripts.", say: "When Excel breaks at scale, pandas handles it." },
+  { n: 14, term: "Power BI", cat: "Resume · Data", def: "Microsoft BI tool for building interactive dashboards connected to SQL, Excel, and cloud sources.", say: "Power BI is where the data becomes a decision." },
+  { n: 15, term: "Tableau", cat: "Resume · Data", def: "Data visualization platform for drag-and-drop dashboards and published views.", say: "Tableau makes operational data visible to non-analysts." },
+  { n: 16, term: "Root-Cause Analysis", cat: "Resume · Data", def: "Structured investigation to find the underlying cause of a defect or gap, not just the symptom.", say: "Management assumed theft. The data said expired inventory." },
+  { n: 17, term: "Data Quality Identification & Correction", cat: "Resume · Data", def: "Finding wrong, missing, or duplicate records and fixing them at the source.", say: "Bad data in a dashboard is worse than no dashboard." },
+  { n: 18, term: "KPI Architecture", cat: "Resume · Data", def: "Designing a set of metrics that together tell whether the business is healthy — chosen before the dashboard is built.", say: "What decision does this number support? That is the first question." },
+  { n: 19, term: "Operational & Executive Dashboards", cat: "Resume · Data", def: "Two different audiences: ops needs daily line-level detail; execs need trend and exception.", say: "Same data, different altitude." },
+  { n: 20, term: "Variance Analysis", cat: "Resume · Data", def: "Comparing actual to plan (or prior period) and explaining the gap in business terms.", say: "The variance is not the answer. It is the question." },
+  // 21–30 Resume: Technical Support & Automation
+  { n: 21, term: "ETL / Reporting Pipeline Automation", cat: "Resume · Tech", def: "Extract, Transform, Load: moving data from source systems, cleaning it, and loading it into reporting.", say: "I built the pipeline so the report runs itself." },
+  { n: 22, term: "Python Scripting for Data Maintenance", cat: "Resume · Tech", def: "Using Python to automate repetitive data tasks: deduplication, formatting, flagging exceptions.", say: "If I do it twice manually, I script it." },
+  { n: 23, term: "HTML5 / JavaScript Internal Tools", cat: "Resume · Tech", def: "Building or enhancing internal web pages and tools — not a primary developer seat.", say: "I build and enhance internal tools. Not a primary dev seat." },
+  { n: 24, term: "System Usability Troubleshooting", cat: "Resume · Tech", def: "Diagnosing why a user cannot complete a task in a system — often a process problem dressed as a tech problem.", say: "Usability problems are often process problems." },
+  { n: 25, term: "Multi-Source Data Integration", cat: "Resume · Tech", def: "Pulling data from multiple systems (ERP, CRM, spreadsheets) and reconciling them into one source of truth.", say: "I reconcile sources before I build a report." },
+  { n: 26, term: "SAP (as ETL source)", cat: "Resume · Tech", def: "SAP used as a data extraction source — not an SAP configuration role.", say: "I extracted from SAP. I did not configure it." },
+  { n: 27, term: "Salesforce (business systems)", cat: "Resume · Tech", def: "19 years of Salesforce use across sales, ops, and CRM administration.", say: "Salesforce is the CRM I have used longest." },
+  { n: 28, term: "Agile / Scrum Delivery", cat: "Resume · Delivery", def: "Iterative delivery in sprints with backlog, standup, review, and retrospective ceremonies.", say: "I work in sprints. I keep scope visible." },
+  { n: 29, term: "Stakeholder Requirements Translation", cat: "Resume · Delivery", def: "Taking a business owner's verbal need and turning it into a written spec the builder can use.", say: "My job is to close the gap between what they said and what they meant." },
+  { n: 30, term: "Project Progress & Risk Communication", cat: "Resume · Delivery", def: "Regular structured updates to stakeholders — what is on track, what is at risk, and what is needed.", say: "No surprises at go-live." },
+  // 31–40 Resume: AI & Delivery
+  { n: 31, term: "Claude Code / Cursor", cat: "Resume · AI", def: "AI-assisted development tools for writing, editing, and debugging code faster.", say: "I build with AI assistance daily." },
+  { n: 32, term: "ChatGPT / Gemini", cat: "Resume · AI", def: "LLM tools for drafting, analysis, and rapid prototyping of processes and documents.", say: "AI is in my daily workflow, not a side experiment." },
+  { n: 33, term: "Replit", cat: "Resume · AI", def: "Cloud-based IDE for rapid prototyping and deploying small applications.", say: "Replit is where I spin up a proof of concept quickly." },
+  { n: 34, term: "Rapid Prototyping", cat: "Resume · AI", def: "Building a working version fast to validate a concept before investing in full development.", say: "Show me the working version, not the slide deck." },
+  { n: 35, term: "Workflow Automation", cat: "Resume · AI", def: "Using scripts or no-code tools to eliminate manual steps in a recurring process.", say: "Every manual step is a future error." },
+  { n: 36, term: "Inventory / Operations Data Reconciliation", cat: "Resume · Delivery", def: "Matching ERP inventory counts to physical counts and explaining discrepancies.", say: "I traced $90K in missing inventory to an expired-product process gap." },
+  { n: 37, term: "Program Workflow Design", cat: "Resume · Delivery", def: "Designing the sequence of steps, owners, and handoffs for a multi-phase initiative.", say: "A program without a workflow is a list of wishes." },
+  { n: 38, term: "Internal Tool Enhancement Support", cat: "Resume · Tech", def: "Improving existing internal systems — usability fixes, report additions, process integration.", say: "I make what exists work better before proposing something new." },
+  { n: 39, term: "Change Management", cat: "Resume · Process", def: "Planning and executing the human side of a process or system change.", say: "Systems change in a day. People change in a quarter." },
+  { n: 40, term: "Documentation Standards", cat: "Resume · Process", def: "Consistent format for process maps, SOPs, data dictionaries, and system specs.", say: "If it is not documented, it does not exist." },
+  // 41–60 Flory Systems
+  { n: 41, term: "Microsoft Dynamics GP", cat: "Flory · Systems", def: "Flory's ERP: Great Plains by Microsoft — covers GL, AP/AR, Purchasing, Inventory, Manufacturing.", say: "Ramp plan: inventory and manufacturing modules first — that is where this job lives." },
+  { n: 42, term: "ERP (Enterprise Resource Planning)", cat: "Flory · Systems", def: "Software that connects all business functions — finance, inventory, production, purchasing — in one system.", say: "ERP is the system of record. Every number starts there." },
+  { n: 43, term: "General Ledger (GL)", cat: "Flory · Systems", def: "The master financial record where every transaction posts; the foundation of financial reporting.", say: "GL is where operations meets accounting." },
+  { n: 44, term: "Accounts Payable / Accounts Receivable", cat: "Flory · Systems", def: "AP: what the company owes vendors. AR: what customers owe the company.", say: "AP/AR accuracy is a cash flow question." },
+  { n: 45, term: "Bill of Materials (BOM)", cat: "Flory · Systems", def: "The complete list of parts, subassemblies, and quantities needed to build one unit of a product.", say: "Wrong BOM = wrong cost = wrong price." },
+  { n: 46, term: "Work Order", cat: "Flory · Systems", def: "Authorization in ERP to produce a specified quantity of a product; triggers material and labor tracking.", say: "Work order accuracy is where cost data starts." },
+  { n: 47, term: "MRP (Material Requirements Planning)", cat: "Flory · Systems", def: "ERP logic that calculates what to buy and when, based on demand, lead times, and current inventory.", say: "MRP is only as good as the data that feeds it." },
+  { n: 48, term: "Inventory Accuracy", cat: "Flory · Systems", def: "Degree to which ERP quantities match physical counts; critical for planning and costing.", say: "Phantom inventory is a planning problem waiting to happen." },
+  { n: 49, term: "Cycle Count", cat: "Flory · Systems", def: "Rolling physical count of inventory subsets — keeps accuracy without a full annual shutdown.", say: "Cycle counts catch drift before it becomes a write-off." },
+  { n: 50, term: "Power BI + Dynamics GP integration", cat: "Flory · Systems", def: "Connecting Power BI to GP's SQL Server database for live operational and financial dashboards.", say: "GP is the source. Power BI is how leadership sees it." },
+  { n: 51, term: "Data Dictionary", cat: "Flory · Systems", def: "Documented definition of every field in a system: what it means, who owns it, and how it is populated.", say: "No data dictionary = undocumented assumptions everywhere." },
+  { n: 52, term: "System of Record", cat: "Flory · Systems", def: "The single authoritative source for a piece of data — all other systems defer to it.", say: "GP is the system of record. The spreadsheet is not." },
+  { n: 53, term: "Data Governance", cat: "Flory · Systems", def: "Policies and ownership rules for who can create, edit, or delete data in enterprise systems.", say: "Governance answers: who is allowed to change this, and who gets notified?" },
+  { n: 54, term: "User Access / Role Management", cat: "Flory · Systems", def: "Controlling who can read, edit, or approve records in the ERP based on their role.", say: "Access control is where data integrity and compliance meet." },
+  { n: 55, term: "Reporting vs. Transactional Systems", cat: "Flory · Systems", def: "Transactional: the ERP where work happens. Reporting: the BI layer where decisions happen.", say: "Run reports against a replica or data warehouse — not the live ERP." },
+  { n: 56, term: "Microsoft Power Platform", cat: "Flory · Systems", def: "Suite including Power BI, Power Automate, Power Apps — common in GP environments for workflow and reporting.", say: "Power Automate is on my ramp list; Power BI I use today." },
+  { n: 57, term: "API / Integration Layer", cat: "Flory · Systems", def: "Software connection that lets two systems exchange data without manual export/import.", say: "Manual data transfer is a future reconciliation problem." },
+  { n: 58, term: "SQL Server", cat: "Flory · Systems", def: "Microsoft database behind Dynamics GP; direct SQL access unlocks data the UI cannot surface.", say: "I query GP's SQL Server directly. That is where the real data lives." },
+  { n: 59, term: "Migration / Data Cleanup", cat: "Flory · Systems", def: "Preparing and moving legacy data into a new or upgraded system accurately.", say: "I built the new reporting system before the migration closed." },
+  { n: 60, term: "SmartList (GP)", cat: "Flory · Systems", def: "GP's built-in query tool for ad-hoc reporting; often the first data tool users reach for.", say: "SmartList is the GP starting point. SQL is the upgrade." },
+  // 61–75 Flory Manufacturing
+  { n: 61, term: "Shop Floor", cat: "Flory · Manufacturing", def: "The physical production area where assembly and fabrication happen.", say: "Shop floor data tells you what ERP data predicted — and where it was wrong." },
+  { n: 62, term: "MES (Manufacturing Execution System)", cat: "Flory · Manufacturing", def: "System that tracks production in real time on the shop floor.", say: "MES is between the work order and the finished unit." },
+  { n: 63, term: "Scrap & Rework", cat: "Flory · Manufacturing", def: "Scrap: material that cannot be used. Rework: material that can be corrected but at added cost.", say: "Scrap and rework rates are the quality KPIs on the floor." },
+  { n: 64, term: "Changeover / Setup Time", cat: "Flory · Manufacturing", def: "Time to reconfigure a machine or line from one product to another.", say: "Changeover is a Lean target — reduce it to increase throughput." },
+  { n: 65, term: "On-Time Delivery (OTD)", cat: "Flory · Manufacturing", def: "Percentage of orders shipped by the committed date — a primary customer-facing KPI.", say: "OTD is the metric dealers and growers feel." },
+  { n: 66, term: "Serial Number Tracking", cat: "Flory · Manufacturing", def: "Assigning unique IDs to finished units for traceability through warranty and field service.", say: "Serial numbers link the sale to the warranty to the part." },
+  { n: 67, term: "Supply Chain Visibility", cat: "Flory · Manufacturing", def: "Knowing the status and location of materials through the full procurement and production chain.", say: "Visibility problems show up as stockouts and expedite costs." },
+  { n: 68, term: "Dealer Support Data", cat: "Flory · Manufacturing", def: "Inventory, pricing, and parts data that supports Flory's dealer network in the field.", say: "Dealer in CCC includes field availability and parts support." },
+  { n: 69, term: "Throughput", cat: "Flory · Manufacturing", def: "Units produced per unit of time; limited by the constraint in the TOC model.", say: "Throughput is the output of the constraint, not the whole line." },
+  { n: 70, term: "Finished Goods Inventory", cat: "Flory · Manufacturing", def: "Completed products ready for shipment; affects cash and delivery promise.", say: "Finished goods accuracy is a cash question in Ag equipment." },
+  { n: 71, term: "Raw Material Inventory", cat: "Flory · Manufacturing", def: "Input materials on hand waiting to enter production.", say: "Raw material accuracy feeds MRP accuracy." },
+  { n: 72, term: "Work-in-Process (WIP)", cat: "Flory · Manufacturing", def: "Units started but not yet complete; a key inventory bucket in manufacturing.", say: "High WIP is often a constraint or scheduling symptom." },
+  { n: 73, term: "Production Schedule", cat: "Flory · Manufacturing", def: "Sequence and timing of work orders released to the floor, aligned to capacity and demand.", say: "The scheduling process is a prime BPA candidate." },
+  { n: 74, term: "Capacity Planning", cat: "Flory · Manufacturing", def: "Matching labor, machine, and material availability to planned production volume.", say: "Capacity gaps show up in the dashboard before they show up on the floor." },
+  { n: 75, term: "Non-Conformance Report (NCR)", cat: "Flory · Manufacturing", def: "Formal record of a defect or deviation; feeds root-cause and corrective action.", say: "NCR data is a root-cause input before you redesign any step." },
+  // 76–88 Flory Lean
+  { n: 76, term: "Lean Manufacturing", cat: "Flory · Lean", def: "Remove waste while protecting value; the discipline behind most Flory CI language.", say: "I bring CI outcomes and MBA Lean exposure; plant language I will deepen on site." },
+  { n: 77, term: "Muda / Waste", cat: "Flory · Lean", def: "Seven non-value activities: waiting, overproduction, defects, excess inventory, motion, transport, over-processing.", say: "Name the waste type before proposing the fix." },
+  { n: 78, term: "Gemba", cat: "Flory · Lean", def: "Go to the actual place of work to observe reality, not manage from reports alone.", say: "Shop observation plus ERP timestamps beats meeting-room guesses." },
+  { n: 79, term: "5S", cat: "Flory · Lean", def: "Sort, Set in order, Shine, Standardize, Sustain — shop floor and data organization discipline.", say: "5S applies to data folders and naming conventions, not just physical space." },
+  { n: 80, term: "Kaizen", cat: "Flory · Lean", def: "Continuous improvement events or culture — small, rapid, team-driven changes.", say: "Kaizen is the mechanism. The KPI is the measure." },
+  { n: 81, term: "Value Stream Mapping (VSM)", cat: "Flory · Lean", def: "Visual diagram of every step (value and non-value) in a process from trigger to delivery.", say: "VSM is the Lean version of as-is process documentation." },
+  { n: 82, term: "Bottleneck", cat: "Flory · Lean", def: "The step that constrains the whole system's throughput; the TOC constraint.", say: "The bottleneck determines the system output ceiling." },
+  { n: 83, term: "OEE (Overall Equipment Effectiveness)", cat: "Flory · Lean", def: "Availability × Performance × Quality: the standard machine productivity metric.", say: "OEE tells you what the machine is actually producing vs. what it could." },
+  { n: 84, term: "PDCA", cat: "Flory · Lean", def: "Plan-Do-Check-Act: the standard CI loop.", say: "Every process improvement I run follows PDCA." },
+  { n: 85, term: "Standard Work", cat: "Flory · Lean", def: "Documented best practice for a task; the baseline that improvement is measured against.", say: "You cannot improve what is not standardized." },
+  { n: 86, term: "Constraint (TOC)", cat: "Flory · Lean", def: "The single limiting factor in a system; TOC says subordinate everything else to it.", say: "Fix the constraint first. Everything else is noise." },
+  { n: 87, term: "Drum-Buffer-Rope", cat: "Flory · Lean", def: "TOC scheduling: the constraint (drum) sets pace; buffer protects it; rope ties release to drum rate.", say: "The drum is the constraint. Release work at the drum rate, not faster." },
+  { n: 88, term: "Pull System / Kanban", cat: "Flory · Lean", def: "Produce only what the next step needs, when it needs it — prevents overproduction.", say: "Pull systems expose the constraint. Push systems hide it." },
+  // 89–100 Flory BPA
+  { n: 89, term: "Business Process Analysis (BPA)", cat: "Flory · BPA", def: "Structured examination of how a process works today, where it fails, and what the improved version looks like.", say: "BPA is the job: document it, find the gap, fix it, measure it." },
+  { n: 90, term: "As-Is / To-Be", cat: "Flory · BPA", def: "Current state (as-is) vs. desired future state (to-be): the two maps every BPA produces.", say: "Show me the as-is before we agree on the to-be." },
+  { n: 91, term: "SIPOC", cat: "Flory · BPA", def: "Supplier-Input-Process-Output-Customer: a one-page scope map for a process.", say: "SIPOC before swim-lane. Scope before detail." },
+  { n: 92, term: "Swim-Lane Diagram", cat: "Flory · BPA", def: "Process map that shows which role or department owns each step.", say: "Swim lanes show where handoffs break." },
+  { n: 93, term: "CCC (Cost, Compliance, Customer)", cat: "Flory · BPA", def: "The three filters Flory applies to assess process health: does it reduce cost, meet compliance, and serve the customer?", say: "Every process recommendation passes the CCC test." },
+  { n: 94, term: "CCC: Cost", cat: "Flory · BPA", def: "Does the process reduce waste, expedite freight, rework, or excess inventory?", say: "Expedite freight is a cost signal — planning failed upstream." },
+  { n: 95, term: "CCC: Compliance", cat: "Flory · BPA", def: "Does the process meet regulatory, warranty, and traceability requirements?", say: "Compliance leg: serial number accuracy and BOM integrity." },
+  { n: 96, term: "CCC: Customer", cat: "Flory · BPA", def: "Does the process serve dealer and grower expectations for delivery, parts, and service?", say: "Customer in CCC includes dealer delivery and field availability." },
+  { n: 97, term: "GQM (Goal-Question-Metric)", cat: "Flory · BPA", def: "Define the goal, ask questions that prove it, then choose metrics that answer those questions.", say: "Goal first, then questions, then metrics. Not metrics first." },
+  { n: 98, term: "PAT (Process Analysis Team)", cat: "Flory · BPA", def: "Chartered cross-functional team for a BPA effort with scope and timeline.", say: "Analysis needs a charter just like implementation does." },
+  { n: 99, term: "Systems Thinking", cat: "Flory · BPA", def: "See process, people, and systems as one loop; this job lives in that intersection.", say: "I work where business operations and IT meet." },
+  { n: 100, term: "Corporate Systems", cat: "Flory · BPA", def: "Shared company systems and data layer under Supply Chain & Corporate Systems at Flory.", say: "Support leadership with systems and process improvement across ops, manufacturing, inventory, and corporate functions." },
+  // 101–115 AgTech / Industry
+  { n: 101, term: "AgTech", cat: "AgTech · Industry", def: "Agricultural technology sector; Flory sits at the intersection of precision hardware and field operations.", say: "AgTech is at the beginning of its data and automation transition; Flory is early infrastructure." },
+  { n: 102, term: "Nut Harvesting Equipment", cat: "AgTech · Industry", def: "Flory's core product line: sweepers, harvesters, and off-ground equipment for almonds, walnuts, pistachios.", say: "On-ground sweeper, off-ground harvester, flail mower — Flory makes the full line." },
+  { n: 103, term: "Dealer Network", cat: "AgTech · Industry", def: "Regional distributors who stock, sell, and support Flory equipment to growers.", say: "On-time delivery to dealers is a customer KPI in the CCC test." },
+  { n: 104, term: "Seasonal Demand", cat: "AgTech · Industry", def: "Harvest cycles drive concentrated demand windows; planning and inventory must anticipate them.", say: "Ag equipment demand is not linear — harvest season drives everything." },
+  { n: 105, term: "Custom Harvesting", cat: "AgTech · Industry", def: "Contract harvesting services run by operators using equipment like Flory machines across multiple farms.", say: "Flory's roots: family dairy and custom harvesting since 1909." },
+  { n: 106, term: "Full-Line Manufacturer", cat: "AgTech · Industry", def: "Flory is the only manufacturer offering both on-ground and off-ground nut-harvesting solutions after the Coe acquisition.", say: "First and only full-line nut-harvesting manufacturer since 2023." },
+  { n: 107, term: "Parts Availability", cat: "AgTech · Industry", def: "Ability to stock and ship replacement parts when equipment breaks in the field during harvest.", say: "Downtime during harvest is catastrophic for the grower." },
+  { n: 108, term: "Field Service", cat: "AgTech · Industry", def: "Technicians who diagnose and repair equipment at the customer site.", say: "Field service response time is a customer and warranty metric." },
+  { n: 109, term: "Grower", cat: "AgTech · Industry", def: "Farmer or orchard operator who buys or uses harvesting equipment.", say: "End customer behind the dealer; reliability and uptime are what they buy." },
+  { n: 110, term: "Warranty Traceability", cat: "AgTech · Industry", def: "Ability to trace a component through production to support warranty claims and field failures.", say: "Compliance leg of the CCC test; serial number and BOM accuracy matter." },
+  { n: 111, term: "Product Configuration", cat: "AgTech · Industry", def: "Customer-selected options on a machine (attachments, sizes, features) that flow into the BOM and work order.", say: "Configured products require BOM accuracy at the order level." },
+  { n: 112, term: "Flail Mower", cat: "AgTech · Industry", def: "Cutting equipment for vineyard and orchard floor management; part of Flory's product lineup.", say: "Flory is not only nut harvesters — vineyard tools and flail mowers too." },
+  { n: 113, term: "Orchard Floor Management", cat: "AgTech · Industry", def: "Practices like sweeping, mowing, and clearing the orchard floor before and during harvest.", say: "Sweeping is the first step before the harvester picks up." },
+  { n: 114, term: "Coe Orchard Equipment", cat: "AgTech · Industry", def: "Acquisition Flory completed in 2023 that made them the industry's first full-line manufacturer.", say: "Know the 2023 acquisition; it is the story behind full-line positioning." },
+  { n: 115, term: "Toomes Road / Salida", cat: "AgTech · Industry", def: "Flory's HQ at 4737 Toomes Road; you are local, across the 99.", say: "I live right across the 99 — no relocation, no commute friction." },
+  // 116–130 Manufacturing continued
+  { n: 116, term: "Purchase Order (PO)", cat: "Flory · Manufacturing", def: "Authorized commitment to a vendor for materials at a price and delivery date.", say: "PO accuracy feeds inventory planning; late or wrong POs create floor stoppages." },
+  { n: 117, term: "Receiving", cat: "Flory · Manufacturing", def: "Process of verifying and logging incoming materials against the PO in the ERP.", say: "Receiving discrepancies are often where inventory accuracy breaks." },
+  { n: 118, term: "Put-Away", cat: "Flory · Manufacturing", def: "Moving received goods to their designated location in the warehouse or stockroom.", say: "Wrong put-away location creates phantom inventory." },
+  { n: 119, term: "Pick List", cat: "Flory · Manufacturing", def: "Work order-driven list of parts to pull from inventory for production.", say: "Inaccurate pick lists cause floor stoppages and rework." },
+  { n: 120, term: "Expedite", cat: "Flory · Manufacturing", def: "Rush a material or job because normal lead time will miss demand.", say: "Expedite freight is a CCC cost signal — it means planning failed upstream." },
+  { n: 121, term: "Lead Time", cat: "Flory · Manufacturing", def: "Calendar days from order to receipt for purchased parts or from release to completion for produced parts.", say: "Lead time feeds MRP; wrong lead times produce wrong purchase dates." },
+  { n: 122, term: "Safety Stock", cat: "Flory · Manufacturing", def: "Buffer inventory held to absorb demand or supply variability.", say: "Safety stock is not waste — it is insurance against a broken process." },
+  { n: 123, term: "Reorder Point", cat: "Flory · Manufacturing", def: "Inventory level that triggers a replenishment order before stock-out.", say: "Reorder point drives purchasing cadence in GP or any ERP." },
+  { n: 124, term: "Cost of Goods Sold (COGS)", cat: "Flory · Manufacturing", def: "Direct material, labor, and overhead consumed to produce shipped units.", say: "COGS is the cost leg of the CCC test at the product level." },
+  { n: 125, term: "Overhead Absorption", cat: "Flory · Manufacturing", def: "How indirect costs (facilities, equipment depreciation) are assigned to production output.", say: "Under-absorption shows up in variance; over-absorption hides cost." },
+  { n: 126, term: "Quality Hold", cat: "Flory · Manufacturing", def: "Quarantine of materials or WIP pending inspection or disposition decision.", say: "Quality hold is a compliance and throughput event; document the trigger and outcome." },
+  { n: 127, term: "Safety Stock", cat: "Flory · Manufacturing", def: "Buffer quantity held to protect against demand or supply variance.", say: "Safety stock is not excess — it is a process gap buffer." },
+  { n: 128, term: "Item Master", cat: "Flory · Systems", def: "Central ERP record for every part: description, UOM, cost, planning parameters.", say: "Item master errors cascade into BOM, inventory, and cost reporting." },
+  { n: 129, term: "Vendor Master", cat: "Flory · Systems", def: "Supplier records including contact, payment terms, and purchasing history.", say: "Clean vendor master prevents mismatched POs and payment errors." },
+  { n: 130, term: "Chart of Accounts", cat: "Flory · Systems", def: "Numbered GL account structure that all transactions post to.", say: "COA structure drives segment-level reporting; understand it before building GL reports." },
+  // 131–143 ERP Depth
+  { n: 131, term: "Period Close", cat: "Flory · Systems", def: "Month-end or year-end process that locks accounting periods and produces financial statements.", say: "Reports run before close may not match post-close actuals." },
+  { n: 132, term: "Integration Manager (GP)", cat: "Flory · Systems", def: "GP tool for importing bulk data from external sources; used for data migration and maintenance.", say: "ETL and data maintenance background applies directly here." },
+  { n: 133, term: "eConnect (GP)", cat: "Flory · Systems", def: "GP API layer for programmatic transaction creation; used in automation and integrations.", say: "API integration experience maps to eConnect work." },
+  { n: 134, term: "User Defined Fields (UDFs)", cat: "Flory · Systems", def: "Custom fields added to GP records to capture business-specific data not in standard modules.", say: "UDFs are where workarounds live; document them before they become technical debt." },
+  { n: 135, term: "SSRS / Report Writer", cat: "Flory · Systems", def: "SQL Server Reporting Services or GP's built-in Report Writer; common GP reporting layers.", say: "Know these exist; Power BI often sits on top of the same SQL Server database." },
+  { n: 136, term: "Data Migration", cat: "Flory · Systems", def: "Moving legacy data into a new or upgraded system accurately and completely.", say: "I built the replacement reporting system before the migration finished." },
+  // 137–143 more ERP/process
+  { n: 137, term: "Audit Trail", cat: "Flory · Systems", def: "Log of who changed what data and when; critical for compliance and dispute resolution.", say: "Audit trail is the compliance answer when someone questions the number." },
+  { n: 138, term: "Exception Reporting", cat: "Flory · Data", def: "Reports that surface only the records that fall outside expected ranges or rules.", say: "Exception reports are how you scale oversight without hiring more reviewers." },
+  { n: 139, term: "Master Data Management", cat: "Flory · Systems", def: "Policies and processes for keeping key reference data (items, vendors, customers) clean and consistent.", say: "Master data is the foundation. Every transaction inherits its quality." },
+  { n: 140, term: "Process Owner", cat: "Flory · BPA", def: "The person accountable for a process end-to-end — responsible for its performance and improvement.", say: "Identify the process owner before the working session starts." },
+  { n: 141, term: "SOP (Standard Operating Procedure)", cat: "Flory · BPA", def: "Step-by-step written instructions for a repeatable task; the output of standardization.", say: "The SOP is not done until a new employee can follow it without help." },
+  { n: 142, term: "Corrective Action", cat: "Flory · BPA", def: "Formal response to a root-cause finding; documents what changed and how results will be verified.", say: "Corrective action closes the PDCA loop." },
+  { n: 143, term: "Process Mapping Software", cat: "Flory · BPA", def: "Tools like Lucidchart, Visio, or Miro used to draw process flows and share them with stakeholders.", say: "The map is for the stakeholder, not the analyst." },
+  // 144–150 Interview Framing
+  { n: 144, term: "Supply Chain & Corporate Systems Director", cat: "Interview · Framing", def: "This role's reporting line at Flory; the hiring manager owns both operational and enterprise system scope.", say: "Two functions in one manager: operations and systems. Communicate in both languages." },
+  { n: 145, term: "Faith, Family, Integrity (Flory Values)", cat: "Interview · Framing", def: "Flory's stated core values; hiring language calls for humble, dedicated, others-focused people.", say: "The data said it was not theft. I delivered that finding directly. That is integrity." },
+  { n: 146, term: "The Flory Way", cat: "Interview · Framing", def: "Flory's vision language for quality equipment and strong relationships across generations.", say: "I build for reliability and sustainability, not for the demo." },
+  { n: 147, term: "Ops-IT Hybrid", cat: "Interview · Framing", def: "This seat sits between business operations and IT; neither pure analyst nor pure developer.", say: "I work where operations and systems meet. That is where I have always worked." },
+  { n: 148, term: "Data Over Assumption", cat: "Interview · Framing", def: "Core operating principle: run the reconciliation before accepting the narrative.", say: "Management assumed theft. The data said expired inventory. We fixed the process." },
+  { n: 149, term: "Build From the Outputs Backward", cat: "Interview · Framing", def: "Design a report or system by starting with what decision it must support, then work backward to the data.", say: "What decision does this number support? That is the first question." },
+  { n: 150, term: "Scope and Accuracy Under Pressure", cat: "Interview · Framing", def: "Ability to keep a complex cross-functional build on track without cutting correctness.", say: "The IrisVision project was not done until I personally beta tested it." },
+];
+
+const CATS = ["All", ...Array.from(new Set(ENTRIES.map((e) => e.cat))).sort()];
+
+const CAT_COLOR: Record<string, string> = {
+  "Resume · Process": "bg-cyan-900/40 text-cyan-300 border-cyan-700",
+  "Resume · Data": "bg-blue-900/40 text-blue-300 border-blue-700",
+  "Resume · Tech": "bg-indigo-900/40 text-indigo-300 border-indigo-700",
+  "Resume · AI": "bg-violet-900/40 text-violet-300 border-violet-700",
+  "Resume · Delivery": "bg-sky-900/40 text-sky-300 border-sky-700",
+  "Flory · Systems": "bg-emerald-900/40 text-emerald-300 border-emerald-700",
+  "Flory · Manufacturing": "bg-amber-900/40 text-amber-300 border-amber-700",
+  "Flory · Lean": "bg-orange-900/40 text-orange-300 border-orange-700",
+  "Flory · BPA": "bg-teal-900/40 text-teal-300 border-teal-700",
+  "Flory · Data": "bg-lime-900/40 text-lime-300 border-lime-700",
+  "AgTech · Industry": "bg-green-900/40 text-green-300 border-green-700",
+  "Interview · Framing": "bg-rose-900/40 text-rose-300 border-rose-700",
+};
+
+function badge(cat: string) {
+  const cls = CAT_COLOR[cat] ?? "bg-zinc-800 text-zinc-300 border-zinc-700";
+  return (
+    <span className={`inline-block text-xs px-2 py-0.5 rounded border ${cls}`}>
+      {cat}
+    </span>
+  );
+}
+
+export default function FloryGlossary() {
+  const [q, setQ] = useState("");
+  const [cat, setCat] = useState("All");
+  const [open, setOpen] = useState<number | null>(null);
+
+  const results = useMemo(() => {
+    const term = q.trim().toLowerCase();
+    return ENTRIES.filter((e) => {
+      if (cat !== "All" && e.cat !== cat) return false;
+      if (!term) return true;
+      return (
+        e.term.toLowerCase().includes(term) ||
+        e.def.toLowerCase().includes(term) ||
+        e.say.toLowerCase().includes(term)
+      );
+    });
+  }, [q, cat]);
+
+  const resumeCount = ENTRIES.filter((e) => e.cat.startsWith("Resume")).length;
+  const floryCount = ENTRIES.filter((e) => e.cat.startsWith("Flory")).length;
+  const agtechCount = ENTRIES.filter((e) => e.cat.startsWith("AgTech")).length;
+  const interviewCount = ENTRIES.filter((e) => e.cat.startsWith("Interview")).length;
+
+  return (
+    <div className="min-h-screen bg-[#050b14] text-[#e0f4ff] px-4 py-8 md:px-8">
+      {/* Header */}
+      <div className="max-w-5xl mx-auto mb-8">
+        <div className="flex items-center gap-3 mb-2">
+          <span className="text-[#00e5ff] text-2xl font-bold tracking-wider">MHG</span>
+          <span className="text-[#6b8fa8] text-sm mt-1">|</span>
+          <span className="text-[#6b8fa8] text-sm mt-1">Interview Prep</span>
+        </div>
+        <h1 className="text-3xl md:text-4xl font-bold text-[#e0f4ff] mb-2">
+          Flory BPDA · 150-Term Glossary
+        </h1>
+        <p className="text-[#6b8fa8] text-sm max-w-2xl">
+          Business Process Data Administrator interview language. Resume skills, Flory JD vocabulary,
+          manufacturing operations, Lean/TOC, AgTech industry context, and interview framing.
+        </p>
+
+        {/* Stats */}
+        <div className="flex flex-wrap gap-4 mt-5">
+          {[
+            { label: "Total Terms", value: ENTRIES.length },
+            { label: "Resume Stack", value: resumeCount },
+            { label: "Flory / Plant", value: floryCount },
+            { label: "AgTech", value: agtechCount },
+            { label: "Interview Framing", value: interviewCount },
+            { label: "Showing", value: results.length },
+          ].map((s) => (
+            <div key={s.label} className="bg-[#0d1b2a] border border-[#1e3a50] rounded-lg px-4 py-2 text-center min-w-[80px]">
+              <div className="text-[#00e5ff] text-xl font-bold">{s.value}</div>
+              <div className="text-[#6b8fa8] text-xs">{s.label}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Filters */}
+      <div className="max-w-5xl mx-auto mb-6">
+        <div className="bg-[#0d1b2a] border border-[#1e3a50] rounded-xl p-4 flex flex-col md:flex-row gap-3">
+          <input
+            type="text"
+            placeholder="Search terms, definitions, say-it lines..."
+            value={q}
+            onChange={(e) => setQ(e.target.value)}
+            className="flex-1 bg-[#050b14] border border-[#1e3a50] rounded-lg px-4 py-2 text-[#e0f4ff] placeholder-[#6b8fa8] text-sm focus:outline-none focus:border-[#00e5ff]"
+          />
+          <select
+            value={cat}
+            onChange={(e) => setCat(e.target.value)}
+            className="bg-[#050b14] border border-[#1e3a50] rounded-lg px-3 py-2 text-[#e0f4ff] text-sm focus:outline-none focus:border-[#00e5ff] md:w-64"
+          >
+            {CATS.map((c) => (
+              <option key={c} value={c}>{c}</option>
+            ))}
+          </select>
+          {(q || cat !== "All") && (
+            <button
+              onClick={() => { setQ(""); setCat("All"); }}
+              className="text-[#6b8fa8] hover:text-[#00e5ff] text-sm px-3"
+            >
+              Clear
+            </button>
+          )}
+        </div>
+        <p className="text-[#6b8fa8] text-xs mt-2 px-1">
+          Honest gaps to keep straight: Dynamics GP (ramp), Power Platform (ramp), formal Lean belt (MBA + CI outcomes, not a belt cert).
+        </p>
+      </div>
+
+      {/* Results */}
+      <div className="max-w-5xl mx-auto space-y-2">
+        {results.length === 0 && (
+          <div className="text-center text-[#6b8fa8] py-16">No terms match. Try a different search.</div>
+        )}
+        {results.map((e) => (
+          <div
+            key={e.n}
+            className="bg-[#0d1b2a] border border-[#1e3a50] rounded-xl overflow-hidden cursor-pointer hover:border-[#00e5ff]/40 transition-colors"
+            onClick={() => setOpen(open === e.n ? null : e.n)}
+          >
+            {/* Row */}
+            <div className="flex items-center gap-3 px-4 py-3">
+              <span className="text-[#6b8fa8] text-xs w-8 text-right shrink-0">{e.n}</span>
+              <div className="flex-1 min-w-0">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="font-semibold text-[#e0f4ff] text-sm">{e.term}</span>
+                  {badge(e.cat)}
+                </div>
+                {open !== e.n && (
+                  <p className="text-[#6b8fa8] text-xs mt-0.5 truncate">{e.def}</p>
+                )}
+              </div>
+              <span className="text-[#6b8fa8] text-xs shrink-0">{open === e.n ? "▲" : "▼"}</span>
+            </div>
+            {/* Expanded */}
+            {open === e.n && (
+              <div className="border-t border-[#1e3a50] px-4 py-3 space-y-3">
+                <div>
+                  <div className="text-[#6b8fa8] text-xs uppercase tracking-wide mb-1">Definition</div>
+                  <p className="text-[#e0f4ff] text-sm leading-relaxed">{e.def}</p>
+                </div>
+                <div className="bg-[#050b14] border border-[#1e3a50] rounded-lg px-3 py-2">
+                  <div className="text-[#00e5ff] text-xs uppercase tracking-wide mb-1">Say it</div>
+                  <p className="text-[#e0f4ff] text-sm italic">&quot;{e.say}&quot;</p>
+                </div>
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+
+      {/* Footer */}
+      <div className="max-w-5xl mx-auto mt-12 pt-6 border-t border-[#1e3a50] text-center text-[#6b8fa8] text-xs">
+        Flory Industries · Business Process Data Administrator · Interview Prep · MHG Strategy
+      </div>
+    </div>
+  );
+}
