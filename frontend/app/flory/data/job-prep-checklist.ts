@@ -39,7 +39,7 @@ export const JOB_PREP_GROUPS: ChecklistGroup[] = [
   {
     title: "Study",
     items: [
-      { id: "jp-glossary", label: "Glossary skimmed (150 terms)" },
+      { id: "jp-glossary", label: "Glossary skimmed (207 terms)" },
       { id: "jp-bpa", label: "BPA Guide reviewed (GQM, CCC, detective mode)" },
       { id: "jp-phase1", label: "Microsoft Learn Phase 1 started" },
       { id: "jp-applyit", label: "Apply It tab reviewed (Nut Harvester data model)" },

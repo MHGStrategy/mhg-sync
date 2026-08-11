@@ -1,3 +1,5 @@
+import { D365_GLOSSARY, ETHICS_GLOSSARY } from "./glossary-learn";
+
 export type GlossaryEntry = {
   n: number;
   term: string;
@@ -6,7 +8,7 @@ export type GlossaryEntry = {
   say: string;
 };
 
-export const ENTRIES: GlossaryEntry[] = [
+const CORE_ENTRIES: GlossaryEntry[] = [
   // 1–20 Resume: Business Systems & Workflow Improvement
   { n: 1, term: "Current-State Workflow Documentation", cat: "Resume · Process", def: "Written map of how work actually runs today: steps, owners, systems, handoffs, and exceptions.", say: "I document as-is before I recommend to-be." },
   { n: 2, term: "Business Rules", cat: "Resume · Process", def: "The if/then logic that governs decisions: approvals, discounts, inventory holds, routing.", say: "If it is not written as a rule, the system will not enforce it." },
@@ -172,6 +174,13 @@ export const ENTRIES: GlossaryEntry[] = [
   { n: 150, term: "Scope and Accuracy Under Pressure", cat: "Interview · Framing", def: "Ability to keep a complex cross-functional build on track without cutting correctness.", say: "The IrisVision project was not done until I personally beta tested it." },
 ];
 
+const LEARN_ENTRIES: GlossaryEntry[] = [...D365_GLOSSARY, ...ETHICS_GLOSSARY].map((e, i) => ({
+  n: CORE_ENTRIES.length + i + 1,
+  ...e,
+}));
+
+export const ENTRIES: GlossaryEntry[] = [...CORE_ENTRIES, ...LEARN_ENTRIES];
+
 export const CATS = ["All", ...Array.from(new Set(ENTRIES.map((e) => e.cat))).sort()];
 
 export const CAT_COLOR: Record<string, string> = {
@@ -187,4 +196,6 @@ export const CAT_COLOR: Record<string, string> = {
   "Flory · Data": "bg-lime-900/40 text-lime-300 border-lime-700",
   "AgTech · Industry": "bg-green-900/40 text-green-300 border-green-700",
   "Interview · Framing": "bg-rose-900/40 text-rose-300 border-rose-700",
+  "Learn · D365 / GP": "bg-purple-900/40 text-purple-300 border-purple-700",
+  "Learn · AI Ethics": "bg-fuchsia-900/40 text-fuchsia-300 border-fuchsia-700",
 };

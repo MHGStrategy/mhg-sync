@@ -57,6 +57,22 @@ export function GlossaryTab() {
         <p className="text-[#6b8fa8] text-xs mt-3">
           Honest gaps: Dynamics GP (ramp), Power Platform (ramp), formal Lean belt (MBA + CI outcomes, not cert).
         </p>
+        <div className="flex flex-wrap gap-2 mt-3">
+          {["Learn · D365 / GP", "Learn · AI Ethics"].map((learnCat) => (
+            <button
+              key={learnCat}
+              type="button"
+              onClick={() => setCat(cat === learnCat ? "All" : learnCat)}
+              className={`text-xs px-3 py-1 rounded-full border transition-colors ${
+                cat === learnCat
+                  ? CAT_COLOR[learnCat]
+                  : "border-[#1e3a50] text-[#6b8fa8] hover:border-[#00e5ff]/40"
+              }`}
+            >
+              {learnCat.replace("Learn · ", "")}
+            </button>
+          ))}
+        </div>
       </SectionCard>
 
       <p className="text-[#6b8fa8] text-sm">
