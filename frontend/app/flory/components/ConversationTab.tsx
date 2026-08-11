@@ -7,6 +7,15 @@ import {
   EQUIPMENT_DASHBOARD_ROWS,
   GP365_EVOLUTION,
   GP365_INTERVIEW_LINE,
+  GP_LIFECYCLE_MILESTONES,
+  GP_MICROSOFT_RECOMMENDED_PATH,
+  GP_MICROSOFT_RESOURCES,
+  GP_MIGRATION_SCOPE,
+  GP_PAGE_SUMMARY,
+  GP_STRATEGIC_QUESTION,
+  GP_TRANSITION_REALITY,
+  GP_VERSION_NOTE,
+  GP_WHAT_STOPS_AFTER_2029,
   HORIZON_BRIDGE,
   IOT_FOUNDATION,
   PROACTIVE_REVENUE_EXAMPLE,
@@ -66,17 +75,105 @@ export function ConversationTab() {
       )}
 
       {openHorizon === "h2" && (
-        <SectionCard title="Horizon 2: Systems evolution (GP to D365)">
-          <ul className="space-y-2 mb-4">
-            {GP365_EVOLUTION.map((b) => (
-              <li key={b} className="text-sm text-[#e0f4ff] flex gap-2">
-                <span className="text-[#00e5ff]">·</span>
-                {b}
-              </li>
-            ))}
-          </ul>
-          <Callout tone="success">&quot;{GP365_INTERVIEW_LINE}&quot;</Callout>
-        </SectionCard>
+        <>
+          <Callout>{GP_PAGE_SUMMARY}</Callout>
+
+          <SectionCard title="GP lifecycle dates (Microsoft Learn)">
+            <div className="space-y-3 mb-4">
+              {GP_LIFECYCLE_MILESTONES.map((m) => (
+                <div
+                  key={m.date}
+                  className="border border-[#1e3a50] rounded-lg px-3 py-2 bg-[#050b14]"
+                >
+                  <div className="flex flex-wrap items-baseline gap-2">
+                    <span className="text-[#00e5ff] text-sm font-medium">{m.date}</span>
+                    <span className="text-[#e0f4ff] text-sm">{m.label}</span>
+                  </div>
+                  <p className="text-xs text-[#6b8fa8] mt-1">{m.detail}</p>
+                </div>
+              ))}
+            </div>
+            <p className="text-xs text-[#6b8fa8] mb-2">After December 31, 2029, Microsoft will no longer provide:</p>
+            <ul className="space-y-1">
+              {GP_WHAT_STOPS_AFTER_2029.map((item) => (
+                <li key={item} className="text-sm text-[#e0f4ff]">
+                  · {item}
+                </li>
+              ))}
+            </ul>
+            <p className="text-xs text-[#6b8fa8] mt-3">{GP_VERSION_NOTE}</p>
+          </SectionCard>
+
+          <SectionCard title="What the transition actually involves">
+            <ul className="space-y-2">
+              {GP_TRANSITION_REALITY.map((b) => (
+                <li key={b} className="text-sm text-[#e0f4ff] flex gap-2">
+                  <span className="text-[#00e5ff]">·</span>
+                  {b}
+                </li>
+              ))}
+            </ul>
+          </SectionCard>
+
+          <SectionCard title="Microsoft's recommended path vs. Flory context">
+            <p className="text-sm text-[#e0f4ff] mb-2">
+              Microsoft encourages GP customers to move to{" "}
+              <strong className="text-[#00e5ff] font-medium">
+                {GP_MICROSOFT_RECOMMENDED_PATH.product}
+              </strong>
+              :
+            </p>
+            <ul className="space-y-1 mb-3">
+              {GP_MICROSOFT_RECOMMENDED_PATH.reasons.map((r) => (
+                <li key={r} className="text-sm text-[#e0f4ff]">
+                  · {r}
+                </li>
+              ))}
+            </ul>
+            <p className="text-sm text-[#6b8fa8]">{GP_MICROSOFT_RECOMMENDED_PATH.caveat}</p>
+          </SectionCard>
+
+          <SectionCard title="Migration scope checklist">
+            <ul className="space-y-1">
+              {GP_MIGRATION_SCOPE.map((item) => (
+                <li key={item} className="text-sm text-[#e0f4ff]">
+                  · {item}
+                </li>
+              ))}
+            </ul>
+          </SectionCard>
+
+          <SectionCard title="Your role in the transition">
+            <ul className="space-y-2 mb-4">
+              {GP365_EVOLUTION.map((b) => (
+                <li key={b} className="text-sm text-[#e0f4ff] flex gap-2">
+                  <span className="text-[#00e5ff]">·</span>
+                  {b}
+                </li>
+              ))}
+            </ul>
+            <Callout tone="success">&quot;{GP365_INTERVIEW_LINE}&quot;</Callout>
+            <p className="text-sm text-[#00e5ff] mt-4 font-medium">{GP_STRATEGIC_QUESTION}</p>
+          </SectionCard>
+
+          <SectionCard title="Microsoft GP resources">
+            <ul className="space-y-3">
+              {GP_MICROSOFT_RESOURCES.map((r) => (
+                <li key={r.url}>
+                  <a
+                    href={r.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sm text-[#00e5ff] hover:underline"
+                  >
+                    {r.label}
+                  </a>
+                  <p className="text-xs text-[#6b8fa8] mt-0.5">{r.note}</p>
+                </li>
+              ))}
+            </ul>
+          </SectionCard>
+        </>
       )}
 
       {openHorizon === "h3" && (

@@ -21,11 +21,93 @@ export const SUCCESS_TODAY = [
 ];
 
 export const GP365_EVOLUTION = [
-  "GP is system of record today; D365 SCM is the strategic growth platform.",
+  "GP is system of record today; D365 SCM is the strategic growth platform for Flory's manufacturing depth.",
   "What changes: module names, cloud reporting, Power Platform depth, migration and data cleanup projects.",
   "What stays: process thinking, transaction traceability, BOM/MRP/inventory models, SQL against ERP data, BPA lifecycle.",
   "Your value in transition: map as-is GP workflows before configuring to-be D365; build parallel reporting; document UDFs and workarounds before they become migration debt.",
 ];
+
+export type GpLifecycleMilestone = { date: string; label: string; detail: string };
+
+export const GP_LIFECYCLE_MILESTONES: GpLifecycleMilestone[] = [
+  {
+    date: "December 31, 2029",
+    label: "Mainstream support ends",
+    detail:
+      "No new product enhancements, regulatory or tax updates, or Microsoft technical support after this date.",
+  },
+  {
+    date: "April 30, 2031",
+    label: "Security coverage window",
+    detail:
+      "Security updates and patches may continue through this date if needed. Plan around 2029 for product and compliance risk, not 2031 alone.",
+  },
+];
+
+export const GP_PAGE_SUMMARY =
+  "Microsoft's Dynamics GP documentation page is no longer just product help. It is a migration planning notice: GP is in its final lifecycle phase, and customers should start transition planning now.";
+
+export const GP_WHAT_STOPS_AFTER_2029 = [
+  "New product enhancements",
+  "Regulatory and tax updates",
+  "Microsoft technical support",
+];
+
+export const GP_TRANSITION_REALITY = [
+  "GP is often deeply embedded: years of financial data, customizations, integrations, reports, workflows, and plant-specific procedures.",
+  "Microsoft is not saying turn off GP and turn on a cloud ERP overnight. Partners and qualified implementers help build a migration strategy.",
+  "Support continues to the best of Microsoft's ability before 2029, but investment in GP will gradually constrain. Do not assume historical update cadence forever.",
+  "SPLA subscription licensing has separate end dates. Licensing and subscription arrangements need review alongside technical support timelines.",
+];
+
+export const GP_MICROSOFT_RECOMMENDED_PATH = {
+  product: "Dynamics 365 Business Central",
+  reasons: [
+    "Cloud-based infrastructure and modern security",
+    "Deeper Microsoft ecosystem integration",
+    "AI capabilities and modern analytics",
+    "Easier remote access and more frequent platform updates",
+  ],
+  caveat:
+    "Microsoft's default SMB destination is Business Central. Flory runs discrete manufacturing on GP with inventory, purchasing, and shop-floor complexity. Leadership may evaluate D365 Supply Chain Management for manufacturing depth. In interview: support GP now; help map as-is processes and data so any migration is deliberate, not reactive.",
+};
+
+export const GP_MIGRATION_SCOPE = [
+  "ERP processes and business rules",
+  "Financial and operational data",
+  "Customizations and third-party applications",
+  "Integrations and reporting",
+  "Workflows and user roles",
+  "Historical data and compliance requirements",
+  "Employee training and adoption",
+  "What to replicate vs. what to redesign or automate during migration",
+];
+
+export type GpResourceLink = { label: string; url: string; note: string };
+
+export const GP_MICROSOFT_RESOURCES: GpResourceLink[] = [
+  {
+    label: "Dynamics GP Resource Directory",
+    url: "https://learn.microsoft.com/en-us/dynamics-gp/resources",
+    note: "Documentation hub, blogs, downloads, and community links in one place.",
+  },
+  {
+    label: "Dynamics GP documentation",
+    url: "https://learn.microsoft.com/en-us/dynamics-gp/",
+    note: "Product help, lifecycle notice, and migration guidance on Microsoft Learn.",
+  },
+  {
+    label: "Dynamics GP Support and Services blog",
+    url: "https://community.dynamics.com/gp/b/dynamicsgp",
+    note: "Updates, tips, year-end processing, and practical GP topics.",
+  },
+];
+
+export const GP_VERSION_NOTE =
+  "Current Dynamics GP version 18.x follows Microsoft's Modern Lifecycle Policy. GP is managed on a defined end date, not as indefinitely supported legacy software.";
+
+export const GP_STRATEGIC_QUESTION =
+  "The strategic question is not only how long we can keep GP. It is what our migration strategy is, which platform fits our manufacturing model, and when we start executing.";
 
 export const GP365_INTERVIEW_LINE =
   "I can support GP operations now and help leadership make the migration deliberate rather than reactive.";
