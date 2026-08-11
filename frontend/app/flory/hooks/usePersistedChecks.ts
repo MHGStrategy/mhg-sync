@@ -41,6 +41,7 @@ export function usePersistedChecks(storageKey: string, ids: string[]) {
 export function resetAllFloryProgress() {
   [
     "flory-ms-courses",
+    "flory-ms-courses-v2",
     "flory-ethics-mooc",
     "flory-job-prep",
     "flory-apply-it-projects",

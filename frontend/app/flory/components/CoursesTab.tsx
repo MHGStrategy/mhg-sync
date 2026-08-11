@@ -2,10 +2,15 @@
 
 import {
   COURSES_FRAMING,
+  KIND_LABEL,
   LEARNING_STACK,
+  LINK_LABEL,
   MS_COURSE_IDS,
   MS_COURSES,
+  MS_COURSES_STORAGE_KEY,
   PHASES,
+  SCM_TRAINING_HUB_URL,
+  type CourseKind,
 } from "../data/courses";
 import { usePersistedChecks } from "../hooks/usePersistedChecks";
 import { ChecklistItem, ProgressBar } from "./ChecklistItem";
@@ -25,9 +30,23 @@ function PriorityBadge({ p }: { p: "essential" | "high" }) {
   );
 }
 
+function KindBadge({ kind }: { kind: CourseKind }) {
+  const cls =
+    kind === "path"
+      ? "border-purple-700/60 text-purple-300 bg-purple-950/30"
+      : kind === "module"
+        ? "border-sky-700/60 text-sky-300 bg-sky-950/30"
+        : kind === "docs"
+          ? "border-emerald-700/60 text-emerald-300 bg-emerald-950/30"
+          : "border-zinc-600/60 text-zinc-300 bg-zinc-900/40";
+  return (
+    <span className={`text-xs px-2 py-0.5 rounded border ${cls}`}>{KIND_LABEL[kind]}</span>
+  );
+}
+
 export function CoursesTab() {
   const { checked, toggle, doneCount, total } = usePersistedChecks(
-    "flory-ms-courses",
+    MS_COURSES_STORAGE_KEY,
     MS_COURSE_IDS
   );
 
@@ -36,6 +55,18 @@ export function CoursesTab() {
       <Callout>{COURSES_FRAMING}</Callout>
 
       <SectionCard title="Microsoft Learn checklist">
+        <p className="text-[#6b8fa8] text-xs mb-3">
+          Curriculum updated with verified Learn URLs. Checklist reset from prior version; browse the{" "}
+          <a
+            href={SCM_TRAINING_HUB_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-[#00e5ff] hover:underline"
+          >
+            D365 SCM training catalog
+          </a>{" "}
+          for additional paths.
+        </p>
         <ProgressBar done={doneCount} total={total} />
         <div className="space-y-1">
           {MS_COURSES.map((c) => (
@@ -49,7 +80,8 @@ export function CoursesTab() {
               />
               <div className="flex flex-wrap gap-2 mt-1 ml-7">
                 <PriorityBadge p={c.priority} />
-                {c.url && (
+                <KindBadge kind={c.kind} />
+                {c.url && LINK_LABEL[c.kind] && (
                   <a
                     href={c.url}
                     target="_blank"
@@ -57,8 +89,11 @@ export function CoursesTab() {
                     className="text-xs text-[#00e5ff] hover:underline"
                     onClick={(e) => e.stopPropagation()}
                   >
-                    Open on Learn
+                    {LINK_LABEL[c.kind]}
                   </a>
+                )}
+                {c.kind === "practice" && (
+                  <span className="text-xs text-[#6b8fa8]">Apply It tab · Nut Harvester model</span>
                 )}
               </div>
             </div>
@@ -66,7 +101,7 @@ export function CoursesTab() {
         </div>
       </SectionCard>
 
-      <SectionCard title="8 phases">
+      <SectionCard title="9 study phases">
         {PHASES.map((p) => (
           <div key={p.title} className="mb-4 last:mb-0">
             <h4 className="text-[#00e5ff] text-sm font-medium mb-1">{p.title}</h4>
